@@ -32,3 +32,10 @@ To close the created pool on app shutdown.
 async def close():
     global pool
     await pool.close()
+
+'''
+Function to get the pool 
+'''
+def get_pool():
+    global pool
+    return pool

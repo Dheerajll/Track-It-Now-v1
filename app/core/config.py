@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     SECRET_KEY : str
     ACCESS_TOKEN_EXPIRY : int = 30 #minutes
     REFRESH_TOKEN_EXPIRY : int = 5 #days
-    ALGORITHMS : str = "HS256"
+    ALGORITHM : str = "HS256"
 
 
     #CORS origin for backend
