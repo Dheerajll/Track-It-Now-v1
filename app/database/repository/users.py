@@ -38,13 +38,13 @@ class UsersRepo:
             return User(**dict(user))
         
     #UPDATE
-    async def update_status(self,email:str):
+    async def update_status(self,email:str,status:bool):
         query="""
             UPDATE users SET  is_active = $1
             WHERE email = $2;
         """
         async with self.pool.acquire() as conn:
-            result = await conn.execute(query,email)
+            result = await conn.execute(query,status,email)
             if result == "UPDATE 0":
                 return False
             else:

@@ -70,7 +70,7 @@ class UserServices:
             Setting refresh token in cookie
             '''
             response.set_cookie(
-                key=f"refresh_token_{user.id}",
+                key=f"refresh_token",
                 value=refresh_token,
                 samesite="lax",
                 httponly=True,
@@ -81,6 +81,11 @@ class UserServices:
             Storing in redis memory
             '''
             await redis_client.set(f"refresh_token_{user.id}",refresh_token,ex=5*24*60*60)
+
+            '''
+            Updating the active status as the user will be active after logging in.
+            '''
+            await self.usersrepo.update_status(user.email,True)
 
             return response
         except Exception as e:
@@ -128,19 +133,37 @@ class UserServices:
             await redis_client.set(f"refresh_token_{user_id}",new_refresh_token)
 
             response.set_cookie(
-                key=f"refresh_token_{user_id}",
+                key=f"refresh_token",
                 value=new_refresh_token,
                 samesite="lax",
                 httponly=True,
                 path="/"
             )
+            return response
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error while refreshing access token. {e}")
 
+    async def logout_user(self,response:Response,user:UserOut):
+        '''
+        For logout, we remove the refresh token from the redis memory
+        and cookie this will automatically 
+        '''
+        await redis_client.delete(f"refresh_token_{user.id}")
 
+        response = JSONResponse(content={"message":"User logged out."})
+
+        response.delete_cookie(
+            key="refresh_token",
+            samesite="lax",
+            path="/"
+        )
+        '''
+        Updating the status when user logs out
+        '''
+        await self.usersrepo.update_status(user.email,False)
+
+        return response
     
-
-
        
 
 

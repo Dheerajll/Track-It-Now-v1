@@ -1,8 +1,8 @@
 from fastapi import APIRouter,Response,Depends,Request,HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from app.services.dependencies import get_user_service
+from app.services.dependencies import get_user_service,get_current_active_user
 from app.services.users import UserServices
-from app.schemas.users import CreateUser
+from app.schemas.users import CreateUser,UserOut
 router = APIRouter(
     prefix="/auth",
     tags=["auth"]
@@ -22,3 +22,11 @@ async def refresh(response:Response,request:Request,userservices:UserServices = 
     if not token:
         raise HTTPException(status_code=401,detail="No refresh token received.")
     return await userservices.access_token_refresh(response,token)
+
+@router.get("/profile")
+def get_me(current_user:UserOut = Depends(get_current_active_user)):
+    return current_user
+
+@router.get("/logout")
+def logout(response:Response,userservices:UserServices = Depends(get_user_service),current_user:UserOut= Depends(get_current_active_user)):
+    return userservices.logout_user(response,current_user)
