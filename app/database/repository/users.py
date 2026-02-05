@@ -61,11 +61,6 @@ class UsersRepo:
                 return False
             else:
                 return True
-    
-'''
-Dependency to get users repo
-'''
-def get_user_repo(pool=Depends(get_pool))->UsersRepo:
-    return UsersRepo(pool)
+
 
     

@@ -91,11 +91,12 @@ class UserServices:
         except Exception as e:
             raise HTTPException(status_code=500,detail=f"Error while creating jwt token, {e}")
         
+        
+    async def _verify_refresh_token(self,token:str):
         '''
         Verify the refresh token from the browser cookie to the one
         in the redis memory
         '''
-    async def _verify_refresh_token(self,token:str):
         payload = token_manager.decode_token(token)
         user_id = payload.get("id")
         if not payload:
@@ -163,6 +164,8 @@ class UserServices:
         await self.usersrepo.update_status(user.email,False)
 
         return response
+    
+
     
        
 
