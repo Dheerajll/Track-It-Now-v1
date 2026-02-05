@@ -1,7 +1,9 @@
 from fastapi import Depends,HTTPException,status
 from app.database.session import get_pool
 from app.database.repository.users import UsersRepo
+from app.database.repository.parcels import ParcelRepo
 from app.services.users import UserServices
+from app.services.parcels import ParcelServices
 from app.core.security import token_manager
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas.users import UserOut
@@ -22,6 +24,21 @@ Dependency to get users service
 '''
 def get_user_service(userrepo=Depends(get_user_repo))->UserServices:
     return UserServices(userrepo)
+
+
+'''
+Dependency to get parcels repo
+'''
+def get_parcel_repo(pool=Depends(get_pool)):
+    return ParcelRepo(pool)
+
+
+'''
+Dependency to get parcels service
+'''
+def get_parcel_service(parcelrepo=Depends(get_parcel_repo)):
+    return ParcelServices(parcelrepo)
+
 
 '''
 Dependency to get current user
