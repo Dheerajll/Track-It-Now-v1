@@ -6,7 +6,7 @@ class ParcelRepo:
     
     #CREATE
     '''
-    This main hindrance while creating a parcel is that we also need to
+    This main thing to be aware while creating a parcel is that we also need to
     create a parcel points for this 
     '''
     async def create_parcel(self,parcel:CreateParcel,sender_id:int):
