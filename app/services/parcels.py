@@ -6,9 +6,9 @@ class ParcelServices:
     def __init__(self,parcelrepo:ParcelRepo) -> None:
         self.parcelrepo = parcelrepo
 
-    async def create_parcel(self,parcel:CreateParcel,sender_id:int):
+    async def create_parcel(self,parcel:CreateParcel):
         try:
-            return await self.parcelrepo.create_parcel(parcel,sender_id)
+            return await self.parcelrepo.create_parcel(parcel)
         
         except Exception as e:
             raise HTTPException(status_code=500,detail=f"Error while creating parcel. {e}")

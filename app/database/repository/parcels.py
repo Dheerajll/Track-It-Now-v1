@@ -9,9 +9,9 @@ class ParcelRepo:
     This main thing to be aware while creating a parcel is that we also need to
     create a parcel points for this 
     '''
-    async def create_parcel(self,parcel:CreateParcel,sender_id:int):
+    async def create_parcel(self,parcel:CreateParcel):
         parcel_create_query= """
-        INSERT INTO parcels (sender_id,receiver_id,current_status)
+        INSERT INTO parcels (sender_id,receiver_id,description)
         VALUES ($1,$2,$3)
         RETURNING *;
         """   
@@ -24,7 +24,7 @@ class ParcelRepo:
             '''
             Creating the parcel first.
             '''
-            parcel_row = await conn.fetchrow(parcel_create_query,sender_id,parcel.receiver_id,parcel.current_status)
+            parcel_row = await conn.fetchrow(parcel_create_query,parcel.sender_id,parcel.receiver_id,parcel.description)
 
             '''
             Making the parcel points.
@@ -39,6 +39,7 @@ class ParcelRepo:
                 sender_id=parcel_row["sender_id"],
                 receiver_id=parcel_row["receiver_id"],
                 current_status=parcel_row["current_status"],
+                description=parcel_row["description"],
                 created_at=parcel_row["created_at"],
                 updated_at=parcel_row["updated_at"],
                 source=parcel_point["source"],

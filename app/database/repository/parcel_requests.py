@@ -11,19 +11,19 @@ location of the receiver.
 
 '''
 
-class PracelRequestRepo:
+class ParcelRequestRepo:
     def __init__(self,pool:Pool) -> None:
         self.pool = pool
 
-    async def create_parcel_request(self,receiver_id:int,sender_id:int):
+    async def create_parcel_request(self,receiver_id:int,sender_id:int,parcel_description:str,sender_location:tuple):
         query ="""
-        INSERT INTO parcel_requests(sender_id,receiver_id,expires_at)
-        VALUES ($1,$2,$3)
+        INSERT INTO parcel_requests(sender_id,receiver_id,expires_at,parcel_description,sender_location)
+        VALUES ($1,$2,$3,$4,$5)
         RETURNING *;
         """
         expires_at = datetime.now(timezone.utc) + timedelta(days=1)
         async with self.pool.acquire() as conn:
-            parcel_request = await conn.fetchrow(query,sender_id,receiver_id,expires_at)
+            parcel_request = await conn.fetchrow(query,sender_id,receiver_id,expires_at,parcel_description,sender_location)
         
         return ParcelRequest(**(dict(parcel_request)))
     
@@ -66,6 +66,14 @@ class PracelRequestRepo:
             return {
                 "requests":request_list 
             }
-
+    async def get_request(self,request_id:int):
+        query = """
+        SELECT * FROM parcel_requests
+        WHERE id = $1;
+        """
+        async with self.pool.acquire() as conn:
+            parcel_request = await conn.fetchrow(query,request_id)
+        
+        return ParcelRequest(**dict(parcel_request))
 
         

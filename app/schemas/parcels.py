@@ -9,10 +9,11 @@ class ParcelPoints(BaseModel):
 class CreateParcel(ParcelPoints):
     sender_id : int
     receiver_id : int 
-    current_status : str
+    #STATUS
     '''
     'created' , 'assigned' , 'picked_up' , 'in_transit' , 'delivered'
     '''
+    description :str
 
 class ShowParcel(BaseModel):
     id : int
@@ -22,6 +23,7 @@ class ShowParcel(BaseModel):
     '''
     'created' , 'assigned' , 'picked_up' , 'in_transit' , 'delivered'
     '''
+    description : str
     created_at : datetime
     updated_at : datetime
     source : tuple[float,float]

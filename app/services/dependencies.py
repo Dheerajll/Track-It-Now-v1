@@ -2,6 +2,8 @@ from fastapi import Depends,HTTPException,status
 from app.database.session import get_pool
 from app.database.repository.users import UsersRepo
 from app.database.repository.parcels import ParcelRepo
+from app.database.repository.parcel_requests import ParcelRequestRepo
+from app.services.parcel_requests import ParcelRequestService
 from app.services.users import UserServices
 from app.services.parcels import ParcelServices
 from app.core.security import token_manager
@@ -38,6 +40,21 @@ Dependency to get parcels service
 '''
 def get_parcel_service(parcelrepo=Depends(get_parcel_repo)):
     return ParcelServices(parcelrepo)
+
+
+'''
+Dependency to get parcel_requests repo
+'''
+def get_parcel_requests_repo(pool=Depends(get_pool)):
+    return ParcelRequestRepo(pool)
+
+
+'''
+Dependency to get parcel_requests service
+'''
+
+def get_parcel_requests_service(parcelrequestrepo=Depends(get_parcel_requests_repo),usersrepo=Depends(get_user_repo),parcel_service=Depends(get_parcel_service)):
+    return ParcelRequestService(parcelrequestrepo,usersrepo,parcel_service)
 
 
 '''
