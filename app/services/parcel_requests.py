@@ -53,7 +53,7 @@ class ParcelRequestService:
                 description=description
             )
 
-            await self.parcel_service.create_parcel(parcel)
+            return await self.parcel_service.create_parcel(parcel)
 
         except Exception as e:
             raise HTTPException(status_code=500,detail="Error while accepting parcel request.")
@@ -61,8 +61,8 @@ class ParcelRequestService:
     async def parcel_request_decline(self,request_id:int, user:UserOut):
         try:
             request = await self.request_repo.get_request(request_id)
-            if request_id != user.id:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not allowed to accept parcel request.")
+            if request.receiver_id != user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not allowed to decline parcel request.")
             
             updated = await self.request_repo.update_parcel_request_status(request_id,"declined")
 
@@ -71,11 +71,19 @@ class ParcelRequestService:
             }
         except Exception as e:
             raise HTTPException(status_code=500,detail=f"Error while declining parcel request. {e}")
+        
+    async def sent_parcel_requests(self,sender_id:int):
+        try:
+
+            return await self.request_repo.get_all_pending_requests(sender_id=sender_id)
+        except Exception as e:
+            raise HTTPException(status_code=500,detail="Error while fetching sent requests.")
+    async def received_parcel_requests(self,receiver_id:int):
+        try:
+            return await self.request_repo.get_all_pending_requests(receiver_id=receiver_id)
+        except Exception as e:
+            raise HTTPException(status_code=500,detail="Error while fetching received requests.")
 
 
-
-
-
-                
 
     
