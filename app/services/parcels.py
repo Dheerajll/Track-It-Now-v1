@@ -37,6 +37,25 @@ class ParcelServices:
             
         except Exception as e:
             raise HTTPException(status_code=500,detail=f"Error while updating parcel status. {e}")
+        
+    async def get_created_parcel(self,user_id:int):
+        try:
+            return await self.parcelrepo.get_created_parcel(user_id)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error while fetching created parcels. {e}"
+            )
+    async def get_parcel_to_receive(self,user_id:int):
+        try:
+            return await self.parcelrepo.get_parcel_to_receive(user_id)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error while fetching parcels to receive. {e}"
+            )
+
+        
 
 
 

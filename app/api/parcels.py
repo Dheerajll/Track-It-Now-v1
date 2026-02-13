@@ -64,3 +64,11 @@ async def sent_requests(parcel_request_services:ParcelRequestService=Depends(get
 @router.get("/received-requests")
 async def received_requests(parcel_request_services:ParcelRequestService=Depends(get_parcel_requests_service),receiver:UserOut = Depends(get_current_active_user)):
     return await parcel_request_services.sent_parcel_requests(receiver.id)
+
+
+@router.get("/parcels")
+async def get_parcels(created:bool=True,received:bool=False,user:UserOut=Depends(required_roles(["customer"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
+    if created and not received:
+        return await parcel_services.get_created_parcel(user.id)
+    if received and not created:
+        return await parcel_services.get_parcel_to_receive(user.id)
