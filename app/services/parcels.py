@@ -54,6 +54,15 @@ class ParcelServices:
                 status_code=500,
                 detail=f"Error while fetching parcels to receive. {e}"
             )
+    async def get_a_parcel(self,parcel_id:int):
+        try:
+            return await self.parcelrepo.get_one_parcel(parcel_id)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error while fetching a parcel. {e}"
+            )
+    
 
         
 

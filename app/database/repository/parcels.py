@@ -68,4 +68,56 @@ class ParcelRepo:
         """
         async with self.pool.acquire() as conn:
             await conn.execute(query,parcel_id)
+
+    #READ 
+    '''
+    This one will read the parcel detail and parcel points based on the parcel 
+    '''
+    async def get_created_parcel(self,sender_id :int):
+        query = """
+        SELECT id,sender_id,receiver_id,current_status,description,
+        created_at,updated_at,pp.source,pp.destination 
+        FROM parcels
+        JOIN parcel_points pp
+        ON parcels.id = pp.parcel_id
+        WHERE sender_id = $1;
+        """
+        async with self.pool.acquire() as conn:
+            parcels = await conn.fetch(query,sender_id)
+        
+        if parcels:
+            parcels_out = [Parcel(**dict(parcel)) for parcel in parcels]
+        
+        return parcels_out
+
+    async def get_parcel_to_receive(self,receiver_id :int):
+        query = """
+        SELECT id,sender_id,receiver_id,current_status,description,
+        created_at,updated_at,pp.source,pp.destination 
+        FROM parcels
+        JOIN parcel_points pp
+        ON parcels.id = pp.parcel_id
+        WHERE receiver_id = $1;
+        """
+        async with self.pool.acquire() as conn:
+            parcels = await conn.fetch(query,receiver_id)
+        
+        if parcels:
+            parcels_out = [Parcel(**dict(parcel)) for parcel in parcels]
+        
+        return parcels_out
+    
+    async def get_one_parcel(self,parcel_id :int):
+        query = """
+        SELECT id,sender_id,receiver_id,current_status,description,
+        created_at,updated_at,pp.source,pp.destination 
+        FROM parcels
+        JOIN parcel_points pp
+        ON parcels.id = pp.parcel_id
+        WHERE id = $1;
+        """
+        async with self.pool.acquire() as conn:
+            parcel = await conn.fetchrow(query,parcel_id)       
+        return Parcel(**dict(parcel))
+        
     

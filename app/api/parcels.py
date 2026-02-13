@@ -72,3 +72,9 @@ async def get_parcels(created:bool=True,received:bool=False,user:UserOut=Depends
         return await parcel_services.get_created_parcel(user.id)
     if received and not created:
         return await parcel_services.get_parcel_to_receive(user.id)
+    
+
+@router.get("/parcel")
+async def get_a_only_parcel(parcel_id :int,user:UserOut=Depends(required_roles(["customer"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
+    return await parcel_services.get_a_parcel(parcel_id)
+   
