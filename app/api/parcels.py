@@ -4,6 +4,7 @@ from app.services.parcels import ParcelServices
 from app.services.parcel_requests import ParcelRequestService
 from app.schemas.users import UserOut
 from app.schemas.parcel_requests import ParcelRequestData,ParcelRequestAcceptData
+from app.services.RBAC import required_roles
 router = APIRouter(
     prefix="/parcel",
     tags=["parcel"]
@@ -19,18 +20,21 @@ the status is "accepted"
 # async def create_parcel(parcel:CreateParcel,user:UserOut=Depends(get_current_active_user),parcel_services:ParcelServices=Depends(get_parcel_service)):
 #     return await parcel_services.create_parcel(parcel,user.id)
 
+'''
+We managed the permissions using the required roles dependencies from RBAC.py
+'''
 
 
 
 @router.post("/request")
-async def create_parcel_request(request_info:ParcelRequestData,sender:UserOut=Depends(get_current_active_user),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
+async def create_parcel_request(request_info:ParcelRequestData,sender:UserOut=Depends(required_roles(["customer"])),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
     '''
     This should be only be permitted to customers
     '''
     return await parcel_request_service.create_parcel_request(sender,request_info.receiver_email,request_info.sender_location,request_info.parcel_description)
 
 @router.post("/accept")
-async def parcel_request_accept(accept_params:ParcelRequestAcceptData,receiver:UserOut=Depends(get_current_active_user),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
+async def parcel_request_accept(accept_params:ParcelRequestAcceptData,receiver:UserOut=Depends(required_roles(["customer"])),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
     '''
     This should be only be permitted to customers
     '''
@@ -38,7 +42,7 @@ async def parcel_request_accept(accept_params:ParcelRequestAcceptData,receiver:U
 
 
 @router.post("/decline")
-async def parcel_request_decline(request_id:int,receiver:UserOut=Depends(get_current_active_user),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
+async def parcel_request_decline(request_id:int,receiver:UserOut=Depends(required_roles(["customer"])),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
     '''
     This should be only be permitted to customers
     '''
@@ -46,7 +50,7 @@ async def parcel_request_decline(request_id:int,receiver:UserOut=Depends(get_cur
 
 
 @router.post("/status/update")
-async def update_parcel_status(parcel_id:int,status:str,agent_user:UserOut=Depends(get_current_active_user),parcel_services:ParcelServices=Depends(get_parcel_service)):
+async def update_parcel_status(parcel_id:int,status:str,agent_user:UserOut=Depends(required_roles(["agent"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
     '''
     This should only be permitted to agents
     '''
