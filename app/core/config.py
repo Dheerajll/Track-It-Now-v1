@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
 
     #CORS origin for backend
-    BACKEND_ORIGINS: List[str] = ['http://localhost:5173']
+    BACKEND_ORIGINS: List[str] = ['http://localhost:5173','https://t767qx3z-5173.inc1.devtunnels.ms']
 
 
     class Config:
