@@ -95,7 +95,7 @@ class ParcelRequestService:
             raise HTTPException(status_code=500, detail=f"Error while getting request by id. {e}")
 '''
 
-For notications using Websockets
+For notications using Websockets------------------------------------------------------------------------------------------------------------------------------------------------------------
 '''
 
 
@@ -171,7 +171,7 @@ def verify_token(token:str,role:str, sender_id :str):
     payload = decode_token_for_websocket(token)
     user_role = payload.get("role")
     user_id = payload.get("id")
-    if user_role != role or user_id != sender_id:
+    if user_role != role or str(user_id) != sender_id:
         raise WebSocketAuthError(code=1008,reason="No permission")
 
 async def send_notification(websocket:WebSocket,user_id:str,token:str):
@@ -194,11 +194,11 @@ async def send_notification(websocket:WebSocket,user_id:str,token:str):
                 receiver_id = data["receiver_id"]
 
                 new_message = {
-                    "request_id" : data["receiver_id"],
+                    "request_id" : data["request_id"],
                     "sender_name" : data["sender_name"],
                 }   
 
-                await RNmanager.send_message(new_message,receiver_id) 
+                await RNmanager.send_message(new_message,str(receiver_id)) 
         except (WebSocketDisconnect, Exception) as e:
             RNmanager.disconnect(user_id)
     except WebSocketAuthError as e:
@@ -215,7 +215,7 @@ async def receive_notification(websocket:WebSocket,user_id:str,token:str):
         verify_token(token,"customer",user_id)
         try:
             while True:
-                await websocket.receive()
+                data = await websocket.receive_json()
         except (WebSocketDisconnect,Exception) as e:
             RNmanager.disconnect(user_id)
     except WebSocketAuthError as e:

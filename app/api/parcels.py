@@ -72,7 +72,7 @@ async def sent_requests(parcel_request_services:ParcelRequestService=Depends(get
 
 @router.get("/received-requests")
 async def received_requests(parcel_request_services:ParcelRequestService=Depends(get_parcel_requests_service),receiver:UserOut = Depends(get_current_active_user)):
-    return await parcel_request_services.sent_parcel_requests(receiver.id)
+    return await parcel_request_services.received_parcel_requests(receiver.id)
 
 
 @router.get("/parcels")
