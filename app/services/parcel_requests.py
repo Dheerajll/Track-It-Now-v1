@@ -22,7 +22,24 @@ class ParcelRequestService:
             receiver = await self.users_repo.get(email=receiver_email)
             if receiver:
                 new_request = await self.request_repo.create_parcel_request(receiver.id,sender.id,parcel_description,sender_location)
+            '''
+            Sending notification to the receiver that parcel is created.
+            We will do that by sending a message in the receiver's websocket.
+            '''
+            message = {
+                "type" : "parcel_request",
+                "message" : f"{sender.name} sent parcel request.",
+                "request_id" : new_request.id,
+            }
+
+            '''
+            we convert the receiver id into 
+            into string as send_message expects string
+            '''
+            receiver_id = str(new_request.receiver_id)
             
+            await RNmanager.send_message(message,receiver_id)
+
             return new_request
         
         except Exception as e:
@@ -56,7 +73,27 @@ class ParcelRequestService:
                 description=description
             )
 
-            return await self.parcel_service.create_parcel(parcel)
+            created_parcel =  await self.parcel_service.create_parcel(parcel)
+
+            
+            '''
+            Now to send a notification to the sender
+            that the receiver has accepted the request 
+            and parcel has been created.
+            '''
+            sender_id = str(created_parcel.sender_id)
+            message = {
+                "type" : "parcel_created",
+                "sender_id" :created_parcel.sender_id,
+                "parcel_id" : created_parcel.id,
+                "message" : f"Your parcel to {user.name} has been created."
+            }
+            '''
+            As the sender should receiver the notification
+            '''
+            await RNmanager.send_message(message,sender_id)
+
+            return created_parcel
 
         except Exception as e:
             raise HTTPException(status_code=500,detail="Error while accepting parcel request.")
@@ -129,6 +166,8 @@ class RequestNotificationManager:
 
             if receiver_ws:
                 await receiver_ws.send_json(message)
+            else:
+                print("No receiver websocker connected.")
         except WebSocketDisconnect:
             self.disconnect(receiver_id)
         except Exception as e:
@@ -223,6 +262,7 @@ async def receive_notification(websocket:WebSocket,user_id:str,token:str):
         await websocket.close(code=e.code,reason=e.reason)
     except Exception as e:
         print("Unexpected error: ",e)
+        RNmanager.disconnect(user_id)
         await websocket.close(code=1011,reason="Internal server error")
 
     

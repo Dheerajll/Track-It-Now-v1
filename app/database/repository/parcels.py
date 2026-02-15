@@ -75,8 +75,8 @@ class ParcelRepo:
     '''
     async def get_created_parcel(self,sender_id :int):
         query = """
-        SELECT id,sender_id,receiver_id,current_status,description,
-        created_at,updated_at,pp.source,pp.destination 
+        SELECT parcels.id,parcels.sender_id,parcels.receiver_id,parcels.current_status,parcels.description,
+        parcels.created_at,parcels.updated_at,pp.source,pp.destination 
         FROM parcels
         JOIN parcel_points pp
         ON parcels.id = pp.parcel_id
@@ -92,8 +92,8 @@ class ParcelRepo:
 
     async def get_parcel_to_receive(self,receiver_id :int):
         query = """
-        SELECT id,sender_id,receiver_id,current_status,description,
-        created_at,updated_at,pp.source,pp.destination 
+        SELECT parcels.id,parcels.sender_id,parcels.receiver_id,parcels.current_status,parcels.description,
+        parcels.created_at,parcels.updated_at,pp.source,pp.destination 
         FROM parcels
         JOIN parcel_points pp
         ON parcels.id = pp.parcel_id

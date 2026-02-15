@@ -76,11 +76,14 @@ async def received_requests(parcel_request_services:ParcelRequestService=Depends
 
 
 @router.get("/parcels")
-async def get_parcels(created:bool=True,received:bool=False,user:UserOut=Depends(required_roles(["customer"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
-    if created and not received:
+async def get_parcels(created:bool=False,to_receive:bool=False,user:UserOut=Depends(required_roles(["customer"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
+    if created and not to_receive:
         return await parcel_services.get_created_parcel(user.id)
-    if received and not created:
+    if to_receive and not created:
         return await parcel_services.get_parcel_to_receive(user.id)
+    return {
+        "message" : "incorrect query params."
+    }
     
 
 @router.get("/read")
