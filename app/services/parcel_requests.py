@@ -5,10 +5,18 @@ from fastapi import HTTPException,status
 from app.schemas.parcel_requests import ParcelRequest
 from app.schemas.parcels import CreateParcel
 from app.services.parcels import ParcelServices
+from app.services.websockets import RequestNotificationManager,verify_token,WebSocketAuthError
 from fastapi import WebSocket,WebSocketDisconnect
 from app.core.config import settings
-import jwt
-import json
+
+
+
+
+
+'''
+Creating instance of websocket manager that handles Request notification
+'''
+RNmanager = RequestNotificationManager()
 
 
 class ParcelRequestService:
@@ -134,135 +142,28 @@ class ParcelRequestService:
 
 For notications using Websockets------------------------------------------------------------------------------------------------------------------------------------------------------------
 '''
-
-
-'''
-At first we will create a simple websocket manager
-'''
-class RequestNotificationManager:
-    def __init__(self) -> None:
-        self.active_connections:dict[str,WebSocket] = {}
-    
-    async def connect(self,user_id:str,websocket:WebSocket):
-        try:
-            await websocket.accept()
-            self.active_connections[user_id] = websocket
-            print(f"User {user_id} connected to websocket")
-        
-        except Exception as e:
-            print("Error while connecting to websocket." ,e)
-    
-    def disconnect(self,user_id:str):
-        try:
-            self.active_connections.pop(user_id,None)
-            print(f"User {user_id} disconnect from websocket.")
-        
-        except Exception as e:
-            print("Error while disconnecting from websocket. ",e)
-        
-    async def send_message(self, message:dict,receiver_id:str):
-        try:
-            receiver_ws = self.active_connections.get(receiver_id)
-
-            if receiver_ws:
-                await receiver_ws.send_json(message)
-            else:
-                print("No receiver websocker connected.")
-        except WebSocketDisconnect:
-            self.disconnect(receiver_id)
-        except Exception as e:
-            print("Error while sending message. ",e)
-
-
-'''
-As websocket doesn't need dependencies we create the instance here
-'''
-RNmanager = RequestNotificationManager()
-'''
-We would use the exception class to 
-authenticate the websocket users
-as we can't use dependency on websocket
-'''
-class WebSocketAuthError(Exception):
-    def __init__(self,code,reason)-> None:
-        self.code = code
-        self.reason = reason
-
-
-'''
-To decode the token
-'''
-def decode_token_for_websocket(token: str):
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        return payload
-
-    except jwt.ExpiredSignatureError:
-        raise WebSocketAuthError(code=1008,reason="Token expired")
-
-    except jwt.InvalidTokenError:
-        raise WebSocketAuthError(code=1008,reason="Invalid token")
-
-    except Exception:
-        raise WebSocketAuthError(code=1011,reason="Token decode failed")
-
-def verify_token(token:str,role:str, sender_id :str):
-    payload = decode_token_for_websocket(token)
-    user_role = payload.get("role")
-    user_id = payload.get("id")
-    if user_role != role or str(user_id) != sender_id:
-        raise WebSocketAuthError(code=1008,reason="No permission")
-
-async def send_notification(websocket:WebSocket,user_id:str,token:str):
-    await RNmanager.connect(user_id,websocket)
-
-    '''
-    First we will connect the websocket initially
-    '''
-    try:
-        verify_token(token,"customer",user_id)
-        try:
-            while True:
-                try:
-                    data = await websocket.receive_json()
-                except ValueError as e:
-                    print("Can't parce the given json. ",e)
-                    continue
-
-                #fetch the receiver id from the data 
-                receiver_id = data["receiver_id"]
-
-                new_message = {
-                    "request_id" : data["request_id"],
-                    "sender_name" : data["sender_name"],
-                }   
-
-                await RNmanager.send_message(new_message,str(receiver_id)) 
-        except (WebSocketDisconnect, Exception) as e:
-            RNmanager.disconnect(user_id)
-    except WebSocketAuthError as e:
-        RNmanager.disconnect(user_id)
-        await websocket.close(code = e.code,reason=e.reason)
-    
-    except Exception as e:
-        print("Unexpected error: ",e)
-        await websocket.close(code=1011,reason="Internal server error")
-    
 async def receive_notification(websocket:WebSocket,user_id:str,token:str):
     await RNmanager.connect(user_id,websocket)
     try:
         verify_token(token,"customer",user_id)
-        try:
-            while True:
-                data = await websocket.receive_json()
-        except (WebSocketDisconnect,Exception) as e:
-            RNmanager.disconnect(user_id)
+
+        while True:
+            data = await websocket.receive_json()
+    except WebSocketDisconnect:
+        pass
+
     except WebSocketAuthError as e:
-        RNmanager.disconnect(user_id)
         await websocket.close(code=e.code,reason=e.reason)
+
     except Exception as e:
         print("Unexpected error: ",e)
-        RNmanager.disconnect(user_id)
         await websocket.close(code=1011,reason="Internal server error")
+    
+    finally:
+        '''
+        Doing this after the all exception are passed.
+        '''
+        RNmanager.disconnect(user_id)
+    
 
     

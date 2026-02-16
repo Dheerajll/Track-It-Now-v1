@@ -6,7 +6,7 @@ from app.schemas.users import UserOut
 from app.schemas.parcel_requests import ParcelRequestData,ParcelRequestAcceptData
 from app.services.RBAC import required_roles
 from fastapi import WebSocket
-from app.services.parcel_requests import send_notification,receive_notification
+from app.services.parcel_requests import receive_notification
 
 
 router = APIRouter(
@@ -91,19 +91,9 @@ async def get_a_only_parcel(parcel_id :int,user:UserOut=Depends(required_roles([
     return await parcel_services.get_a_parcel(parcel_id)
    
 '''
-To send and receive the notifications about
+To receive the notifications about
 parcel requests we will use websockets
 '''
-@router.websocket("/send_notification/{user_id}")
-async def notify_receiver(websocket:WebSocket,user_id:str):
-    token = websocket.query_params.get("token")
-    if token:
-        return await send_notification(websocket,user_id,token)
-    return {
-        "message":"No token given in websocket query param"
-    }
-
-
 @router.websocket("/receive_notification/{user_id}")
 async def get_notification(websocket:WebSocket,user_id:str):
     token = websocket.query_params.get("token")
