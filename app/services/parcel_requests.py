@@ -5,7 +5,7 @@ from fastapi import HTTPException,status
 from app.schemas.parcel_requests import ParcelRequest
 from app.schemas.parcels import CreateParcel
 from app.services.parcels import ParcelServices
-from app.services.websockets import RequestNotificationManager,verify_token,WebSocketAuthError
+from app.services.websockets import RNmanager,verify_token,WebSocketAuthError
 from fastapi import WebSocket,WebSocketDisconnect
 from app.core.config import settings
 
@@ -13,10 +13,7 @@ from app.core.config import settings
 
 
 
-'''
-Creating instance of websocket manager that handles Request notification
-'''
-RNmanager = RequestNotificationManager()
+
 
 
 class ParcelRequestService:

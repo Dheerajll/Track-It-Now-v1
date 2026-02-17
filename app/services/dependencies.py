@@ -3,6 +3,8 @@ from app.database.session import get_pool
 from app.database.repository.users import UsersRepo
 from app.database.repository.parcels import ParcelRepo
 from app.database.repository.parcel_requests import ParcelRequestRepo
+from app.database.repository.delivery_assignment import DeliveryRepo
+from app.database.repository.trackingcode import TrackingCodeRepo
 from app.services.parcel_requests import ParcelRequestService
 from app.services.users import UserServices
 from app.services.parcels import ParcelServices
@@ -56,6 +58,21 @@ Dependency to get parcel_requests service
 def get_parcel_requests_service(parcelrequestrepo=Depends(get_parcel_requests_repo),usersrepo=Depends(get_user_repo),parcel_service=Depends(get_parcel_service)):
     return ParcelRequestService(parcelrequestrepo,usersrepo,parcel_service)
 
+
+
+'''
+Dependency to get delivery_assignment repo
+'''
+
+def get_delivery_repo(pool=Depends(get_pool)):
+    return DeliveryRepo(pool)
+
+
+'''
+Dependency  to get tracking code repo
+'''
+def get_tracking_code_repo(pool=Depends(get_pool)):
+    return TrackingCodeRepo(pool)
 
 '''
 Dependency to get current user

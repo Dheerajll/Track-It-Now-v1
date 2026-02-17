@@ -80,14 +80,15 @@ class ParcelRepo:
         FROM parcels
         JOIN parcel_points pp
         ON parcels.id = pp.parcel_id
-        WHERE sender_id = $1;
+        WHERE parcels.sender_id = $1;
         """
         async with self.pool.acquire() as conn:
             parcels = await conn.fetch(query,sender_id)
         
         if parcels:
             parcels_out = [Parcel(**dict(parcel)) for parcel in parcels]
-        
+        else:    
+            parcels_out = []
         return parcels_out
 
     async def get_parcel_to_receive(self,receiver_id :int):

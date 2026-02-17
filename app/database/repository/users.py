@@ -36,6 +36,18 @@ class UsersRepo:
             if user is None:
                 return None
             return User(**dict(user))
+    async def get_by_id(self,user_id:int):
+        query="""
+            SELECT * FROM users
+            WHERE id = $1;
+        """
+        async with self.pool.acquire() as conn:
+           
+            user = await conn.fetchrow(query,user_id)
+            #Returns none is found nothing.
+            if user is None:
+                return None
+            return User(**dict(user))
         
     #UPDATE
     async def update_status(self,email:str,status:bool):

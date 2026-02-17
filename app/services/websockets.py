@@ -115,4 +115,12 @@ class AgentAvailabilityManager:
 
 
 
+'''
+Creating instance of websocket manager that handles Request notification
+'''
+RNmanager = RequestNotificationManager()
 
+'''
+Creating instance of websocket manager that handle agent availability
+'''
+AAmanager = AgentAvailabilityManager()

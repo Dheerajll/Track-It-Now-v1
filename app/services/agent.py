@@ -1,13 +1,11 @@
-from app.services.websockets import AgentAvailabilityManager,verify_token,WebSocketAuthError
+from app.services.websockets import AAmanager,verify_token,WebSocketAuthError
 from fastapi import WebSocket,WebSocketDisconnect
 from app.database.redis_init import redis_client
 import json
 import asyncio
 from collections import defaultdict
-'''
-Creating the instance of the websocket manager.
-'''
-AAmanager = AgentAvailabilityManager()
+
+
 
 
 '''

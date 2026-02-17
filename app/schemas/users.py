@@ -19,6 +19,9 @@ class UserOut(BaseModel):
     role:str
     is_active:bool
 
+    class Config:
+        extra = "ignore"
+
 class CreateUser(BaseModel):
     name:str
     email:str

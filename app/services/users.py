@@ -165,6 +165,18 @@ class UserServices:
 
         return response
     
+    async def get_user_by_id(self,user_id:int):
+        try:
+            return await self.usersrepo.get_by_id(user_id)
+        
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error while fetching user by id. {e}"
+            )
+
+
+    
 
     
        
