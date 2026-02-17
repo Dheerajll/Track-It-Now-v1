@@ -47,7 +47,7 @@ class UsersRepo:
             #Returns none is found nothing.
             if user is None:
                 return None
-            return User(**dict(user))
+            return UserOut(**dict(user))
         
     #UPDATE
     async def update_status(self,email:str,status:bool):
