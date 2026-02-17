@@ -38,17 +38,18 @@ class DeliveryServices:
             '''
             delivery = await self.delivery_repo.create_delivery(parcel_id,agent_id) #type:ignore
 
+            print("Delivery assignment created.")
             '''
             Generating tracking code
             '''
-            tracking_code = await self.tracking_code_repo.create_tracking_code(agent_id,parcel_id)
-
+            tracking_code = (await self.tracking_code_repo.create_tracking_code(agent_id,parcel_id))
+            print("Tracking code generated.")
             '''
             Updating the parcel status to "assigned"
             '''
-            await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
+            #await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
 
-
+            print("Parcel status updated.")
             '''
             Notifying agent that he has been assigned.
             '''
@@ -56,10 +57,10 @@ class DeliveryServices:
                 "type":"parcel-assigned",
                 "parcel_id":parcel_id,
                 "tracking_code":tracking_code,
-                "message":f"{user.name} has assigned you to deliver Parcel{parcel_id}"
+                "message":f"{user.name} has assigned you to deliver Parcel no.{parcel_id}"
             }
             await RNmanager.send_message(message=message_to_agent,receiver_id=str(agent_id))
-
+            print("Notification send to agent.")
             '''
             Notifying receiver that his parcel has been assigned to a agent.
             '''
@@ -78,13 +79,13 @@ class DeliveryServices:
                 "message":f"{agent.name} has been assigned for your parcel no.{parcel_id}"
             }
             await RNmanager.send_message(message=message_to_receiver,receiver_id=str(parcel.receiver_id))
-
+            print("Notification send to receiver.")
             return DeliveryInfo(agent_name=agent.name,tracking_code=tracking_code)
 
         except Exception as e:
             raise HTTPException(
                 status_code= 500,
-                detail=f"Error while assigning parcel to agent"
+                detail=f"Error while assigning parcel to agent. {e}"
             )
 
 

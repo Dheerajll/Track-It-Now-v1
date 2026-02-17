@@ -110,12 +110,12 @@ class ParcelRepo:
     
     async def get_one_parcel(self,parcel_id :int):
         query = """
-        SELECT id,sender_id,receiver_id,current_status,description,
-        created_at,updated_at,pp.source,pp.destination 
+        SELECT parcels.id,parcels.sender_id,parcels.receiver_id,parcels.current_status,parcels.description,
+        parcels.created_at,parcels.updated_at,pp.source,pp.destination 
         FROM parcels
         JOIN parcel_points pp
         ON parcels.id = pp.parcel_id
-        WHERE id = $1;
+        WHERE parcels.id = $1;
         """
         async with self.pool.acquire() as conn:
             parcel = await conn.fetchrow(query,parcel_id)       

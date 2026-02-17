@@ -27,7 +27,7 @@ class TrackingCodeRepo:
         async with self.pool.acquire() as conn:
             track_code = await conn.fetchrow(query,agent_id,parcel_id,create_tracking_code(agent_id,parcel_id))
         
-        return track_code
+        return track_code["tracking_code"]
     
     async def delete_tracking_code(self,track_code:str):
         query = """
