@@ -145,7 +145,7 @@ For notications using Websockets------------------------------------------------
 async def receive_notification(websocket:WebSocket,user_id:str,token:str):
     await RNmanager.connect(user_id,websocket)
     try:
-        verify_token(token,"customer",user_id)
+        verify_token(token,["customer","agent"],user_id)
 
         while True:
             data = await websocket.receive_json()

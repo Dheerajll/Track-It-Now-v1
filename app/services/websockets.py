@@ -22,15 +22,15 @@ class RequestNotificationManager:
             print(f"User {user_id} connected to notification websocket")
         
         except Exception as e:
-            print("Error while connecting to websocket." ,e)
+            print("Error while connecting to notification websocket." ,e)
     
     def disconnect(self,user_id:str):
         try:
             self.active_connections.pop(user_id,None)
-            print(f"User {user_id} disconnect from websocket.")
+            print(f"User {user_id} disconnected from notification websocket.")
         
         except Exception as e:
-            print("Error while disconnecting from websocket. ",e)
+            print("Error while disconnecting from notification websocket. ",e)
         
     async def send_message(self, message:dict,receiver_id:str):
         try:
@@ -39,11 +39,11 @@ class RequestNotificationManager:
             if receiver_ws:
                 await receiver_ws.send_json(message)
             else:
-                print("No receiver websocker connected.")
+                print("No receiver notification websocket connected.")
         except WebSocketDisconnect:
             self.disconnect(receiver_id)
         except Exception as e:
-            print("Error while sending message. ",e)
+            print("Error while sending notification. ",e)
 
 '''
 We would use the exception class to 
@@ -73,11 +73,11 @@ def decode_token_for_websocket(token: str):
     except Exception:
         raise WebSocketAuthError(code=1011,reason="Token decode failed")
 
-def verify_token(token:str,role:str, sender_id :str):
+def verify_token(token:str,role:list[str], sender_id :str):
     payload = decode_token_for_websocket(token)
     user_role = payload.get("role")
     user_id = payload.get("id")
-    if user_role != role or str(user_id) != sender_id:
+    if user_role not in role or str(user_id) != sender_id:
         raise WebSocketAuthError(code=1008,reason="No permission")
 
 
@@ -105,14 +105,14 @@ class AgentAvailabilityManager:
                 await websocket.send_json(message)
             else:
                 print(f"User {user_id} is not connected to search agent websocket.")
+                return
         except WebSocketDisconnect:
-            pass
+            self.disconnect(user_id)
 
         except Exception as e:
+            self.disconnect(user_id)
             print("Error while broadcasting the agent location. ",e)
 
-        finally:
-            self.disconnect(user_id)
 
 
 
