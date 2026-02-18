@@ -3,7 +3,6 @@ from app.core.config import settings
 import asyncio
 from app.database.redis_init import redis_client
 from app.database.repository.location import LocationRepo
-from app.services.dependencies import get_location_repo
 from app.schemas.location import Location
 import json
 import jwt
@@ -176,7 +175,7 @@ class LiveLocationManager:
         #Lock to prevent race condition
         self._channel_locks : dict[str,asyncio.Lock] = {}
     
-    async def connect(self,user_id:str,websocket:WebSocket,location_repo:LocationRepo,channel:str|None = None):
+    async def connect(self,user_id:str,websocket:WebSocket,location_repo:LocationRepo|None = None,channel:str|None = None):
         try:
             await websocket.accept()
             #If we get connection for the broadcast channel
@@ -194,10 +193,11 @@ class LiveLocationManager:
                 # exists if not we create a task for that channel
                 async with lock:
                     if channel not in self.redis_task:
-                        self.redis_task[channel] = asyncio.create_task(redis_listener(channel,location_repo))  
-                        print(f"Redis listener for live-share started for channel: {channel}")
-                    
-                    
+                        if location_repo:
+                            self.redis_task[channel] = asyncio.create_task(redis_listener(channel,location_repo))  
+                            print(f"Redis listener for live-share started for channel: {channel}")
+                        
+                        
                 #Now we register the user to this channnel
                 self.broadcast_channel[channel][user_id] = websocket
                 print(f"User {user_id} entered the broadcast channel:{channel}")

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from app.database import session
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import (users,parcels,agents,delivery)
+from app.api import (users,parcels,agents,delivery,track)
 
 '''
 This is a method which triggers certain functions
@@ -47,6 +47,7 @@ app.include_router(users.router,prefix="/api") # Router for users
 app.include_router(parcels.router,prefix="/api") # Router for parcels
 app.include_router(agents.router,prefix="/api") # Router for agents
 app.include_router(delivery.router,prefix="/api") # Router for delivery
+app.include_router(track.router,prefix="/api") # Router for live-track
 
 
 @app.get("/")
