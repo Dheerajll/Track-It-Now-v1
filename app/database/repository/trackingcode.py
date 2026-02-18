@@ -28,6 +28,19 @@ class TrackingCodeRepo:
             track_code = await conn.fetchrow(query,agent_id,parcel_id,create_tracking_code(agent_id,parcel_id))
         
         return track_code["tracking_code"]
+    async def get_tracking_code(self,tracking_code:str):
+        query ="""
+        SELECT * FROM trackingcode
+        WHERE tracking_code = $1;
+        """
+
+        async with self.pool.acquire() as conn:
+            fetched_tracking_code= await conn.fetchrow(query,tracking_code)
+        
+        if fetched_tracking_code:
+            return dict(fetched_tracking_code)
+        else:
+            return None
     
     async def delete_tracking_code(self,track_code:str):
         query = """

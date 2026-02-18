@@ -1,5 +1,5 @@
 from fastapi import APIRouter,WebSocket,Depends
-from app.services.dependencies import get_location_repo
+from app.services.dependencies import get_location_repo,get_tracking_code_repo
 from app.database.repository.location import LocationRepo
 from app.services.livelocation import start_live_share,listen_to_live_location
 router = APIRouter(
@@ -8,10 +8,10 @@ router = APIRouter(
 )
 
 @router.websocket("/{user_id}/{tracking_code}")
-async def track_agent(user_id:str,tracking_code:str,websocket:WebSocket,location_repo:LocationRepo=Depends(get_location_repo)):
+async def track_agent(user_id:str,tracking_code:str,websocket:WebSocket,location_repo:LocationRepo=Depends(get_location_repo),tracking_repo=Depends(get_tracking_code_repo)):
     token = websocket.query_params.get("token")
     if token:
-        return await listen_to_live_location(user_id=user_id,websocket=websocket,token=token,location_repo=location_repo,tracking_code=tracking_code)
+        return await listen_to_live_location(user_id=user_id,websocket=websocket,token=token,location_repo=location_repo,tracking_code=tracking_code,tracking_repo=tracking_repo)
     
 @router.websocket("/live-share/{user_id}/{tracking_code}")
 async def share_your_location(user_id:str,tracking_code:str,websocket:WebSocket):

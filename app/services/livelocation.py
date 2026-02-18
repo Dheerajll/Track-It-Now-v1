@@ -1,5 +1,6 @@
 from app.services.websockets import LLManager,verify_token,WebSocketAuthError
 from app.database.repository.location import LocationRepo
+from app.database.repository.trackingcode import TrackingCodeRepo
 from app.database.redis_init import redis_client
 from fastapi import WebSocket,WebSocketDisconnect
 import json
@@ -38,10 +39,16 @@ async def start_live_share(user_id:str,websocket:WebSocket,token:str,tracking_co
         LLManager.disconnect(user_id)
     
 
-async def listen_to_live_location(user_id:str,websocket:WebSocket,token:str,location_repo:LocationRepo,tracking_code:str):
+async def listen_to_live_location(user_id:str,websocket:WebSocket,token:str,location_repo:LocationRepo,tracking_code:str,tracking_repo:TrackingCodeRepo):
     await LLManager.connect(user_id,websocket,location_repo,tracking_code)
     try:
         verify_token(token=token,role=["customer"],sender_id=user_id)
+        '''
+        To verify validity of tracking code.
+        '''
+        tracking_code_fetched = await tracking_repo.get_tracking_code(tracking_code=tracking_code)
+        if not tracking_code_fetched:
+            raise WebSocketAuthError(code=1008,reason="Invalid tracking code.")
 
         while True:
             await websocket.receive_text()

@@ -87,7 +87,7 @@ async def get_parcels(created:bool=False,to_receive:bool=False,user:UserOut=Depe
     
 
 @router.get("/read")
-async def get_a_only_parcel(parcel_id :int,user:UserOut=Depends(required_roles(["customer"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
+async def get_a_only_parcel(parcel_id :int,user:UserOut=Depends(required_roles(["customer","agent"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
     return await parcel_services.get_a_parcel(parcel_id)
    
 '''
