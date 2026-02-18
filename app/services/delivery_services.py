@@ -47,7 +47,7 @@ class DeliveryServices:
             '''
             Updating the parcel status to "assigned"
             '''
-            #await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
+            await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
 
             print("Parcel status updated.")
             '''
@@ -57,6 +57,7 @@ class DeliveryServices:
                 "type":"parcel-assigned",
                 "parcel_id":parcel_id,
                 "tracking_code":tracking_code,
+                "delivery_id" : delivery.id,
                 "message":f"{user.name} has assigned you to deliver Parcel no.{parcel_id}"
             }
             await RNmanager.send_message(message=message_to_agent,receiver_id=str(agent_id))
@@ -78,6 +79,9 @@ class DeliveryServices:
                 "tracking_code" : tracking_code,
                 "message":f"{agent.name} has been assigned for your parcel no.{parcel_id}"
             }
+            '''
+            Later send this tracking code in email or receiver.
+            '''
             await RNmanager.send_message(message=message_to_receiver,receiver_id=str(parcel.receiver_id))
             print("Notification send to receiver.")
             return DeliveryInfo(agent_name=agent.name,tracking_code=tracking_code)

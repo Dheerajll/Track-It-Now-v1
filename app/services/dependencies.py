@@ -12,7 +12,7 @@ from app.core.security import token_manager
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas.users import UserOut
 from app.services.delivery_services import DeliveryServices
-
+from app.database.repository.location import LocationRepo
 '''
 Outh2 scheme will be used to make the routes and certain functions protected.
 '''
@@ -81,6 +81,14 @@ Dependency to get delivery service
 '''
 def get_delivery_services(delivery_repo=Depends(get_delivery_repo),tracking_code_repo=Depends(get_tracking_code_repo),parcel_service=Depends(get_parcel_service),userservice=Depends(get_user_service)):
     return DeliveryServices(delivery_repo,tracking_code_repo,parcel_service,userservice)
+
+
+'''
+Dependency to get location repo
+'''
+def get_location_repo(pool=Depends(get_pool)):
+    return LocationRepo(pool)
+
 
 '''
 Dependency to get current user
