@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from app.database.repository.parcels import ParcelRepo
 from app.schemas.parcels import CreateParcel
+from app.services.websockets import RNmanager
 
 class ParcelServices:
     def __init__(self,parcelrepo:ParcelRepo) -> None:
@@ -20,13 +21,33 @@ class ParcelServices:
         '''
         status_list = ("created","assigned","picked_up","in_transit","delivered")
 
+
         if status not in status_list:
             raise HTTPException(status_code=400,detail="Bad request, no such parcel status.")
         
         try:
         
             updated =  await self.parcelrepo.update_parcel_status(parcel_id,status)
+            '''
+            To notify the sender and receiver about the updated status of the parcel
+            '''
+            updated_parcel = await self.parcelrepo.get_one_parcel(parcel_id)
+            sender_id = str(updated_parcel.sender_id)
+            receiver_id = str(updated_parcel.receiver_id)
             if updated:
+                #Notification about parcel status change.
+                message = {
+                    "type" : "parcel-status-changed",
+                    "message" : f"Parcel {parcel_id}'s state changed to {status}",
+                    "parcel_id" :parcel_id,
+                    "status" : status
+                }
+
+                #To receiver
+                await RNmanager.send_message(message=message,receiver_id=receiver_id)
+
+                #To sender 
+                await RNmanager.send_message(message=message,receiver_id=sender_id)
                 return {
                     "message" : "Status updated."
                 }
