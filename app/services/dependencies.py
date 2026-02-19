@@ -39,10 +39,17 @@ def get_parcel_repo(pool=Depends(get_pool)):
 
 
 '''
+Dependency  to get tracking code repo
+'''
+def get_tracking_code_repo(pool=Depends(get_pool)):
+    return TrackingCodeRepo(pool)
+
+
+'''
 Dependency to get parcels service
 '''
-def get_parcel_service(parcelrepo=Depends(get_parcel_repo)):
-    return ParcelServices(parcelrepo)
+def get_parcel_service(parcelrepo=Depends(get_parcel_repo),tracking_code_repo=Depends(get_tracking_code_repo)):
+    return ParcelServices(parcelrepo,tracking_code_repo)
 
 
 '''
@@ -67,13 +74,6 @@ Dependency to get delivery_assignment repo
 
 def get_delivery_repo(pool=Depends(get_pool)):
     return DeliveryRepo(pool)
-
-
-'''
-Dependency  to get tracking code repo
-'''
-def get_tracking_code_repo(pool=Depends(get_pool)):
-    return TrackingCodeRepo(pool)
 
 
 '''

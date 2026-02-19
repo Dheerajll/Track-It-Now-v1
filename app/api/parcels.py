@@ -60,6 +60,15 @@ async def update_parcel_status(parcel_id:int,status:str,agent_user:UserOut=Depen
     '''
     return await parcel_services.update_parcel_status_by_agent(parcel_id,status)
 
+@router.post("/delivery_completed")
+async def delivery_done(parcel_id:int,tracking_code:str,agent_user:UserOut=Depends(required_roles(["agent"])),parcel_services:ParcelServices=Depends(get_parcel_service)):
+    '''
+    This should only be permitted to agents
+    '''
+    return await parcel_services.delivery_completed(parcel_id,tracking_code)
+
+
+
 @router.get("/get-request")
 async def get_request(request_id:int,customer:UserOut=Depends(required_roles(["customer"])),parcel_request_service:ParcelRequestService=Depends(get_parcel_requests_service)):
     return await parcel_request_service.get_request_by_id(request_id)
