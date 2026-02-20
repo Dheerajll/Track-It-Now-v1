@@ -1,5 +1,5 @@
 from asyncpg.pool import Pool
-from app.schemas.delivery import DeliveryShow
+from app.schemas.delivery import DeliveryShow,DeliveryShowToAgent
 
 
 class DeliveryRepo:
@@ -37,6 +37,6 @@ class DeliveryRepo:
         async with self.pool.acquire() as conn:
             deliveries = await conn.fetch(query,agent_id)
         
-        return [DeliveryShow(**dict(delivery)) for delivery in deliveries]
+        return [DeliveryShowToAgent(**dict(delivery)) for delivery in deliveries]
 
 
