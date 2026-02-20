@@ -8,6 +8,8 @@ class DeliveryCreation(BaseModel):
 class DeliveryShow(BaseModel):
     id : int
     parcel_id :int
+    parcel_description:str
+    parcel_destination:tuple[float,float]
     agent_id :int
     assigned_time : datetime | None = None
     started_time : datetime | None = None
