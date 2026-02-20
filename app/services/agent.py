@@ -1,5 +1,6 @@
 from app.services.websockets import AAmanager,verify_token,WebSocketAuthError
 from fastapi import WebSocket,WebSocketDisconnect
+from app.database.repository.delivery_assignment import DeliveryRepo
 from app.database.redis_init import redis_client
 import json
 import asyncio
@@ -297,4 +298,7 @@ async def search_for_agents(user_id:str,websocket:WebSocket,token:str,lat:float,
             task_to_send_snapshot.cancel()
         if task_to_listen_pubsub:    
             task_to_listen_pubsub.cancel()
+
+async def get_agents_deliveries(agent_id :int,deliver_repo:DeliveryRepo):
+    return await deliver_repo.get_deliveries(agent_id)
 

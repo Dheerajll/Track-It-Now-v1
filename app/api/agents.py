@@ -1,6 +1,9 @@
-from fastapi import APIRouter
-from app.services.agent import search_for_agents,go_online
+from fastapi import APIRouter,Depends
+from app.services.agent import search_for_agents,go_online,get_agents_deliveries
 from fastapi import WebSocket
+from app.database.repository.delivery_assignment import DeliveryRepo
+from app.services.dependencies import get_delivery_repo
+
 
 
 router = APIRouter(
@@ -33,3 +36,7 @@ async def search_agents(user_id :str, websocket:WebSocket):
     return {
         "message":"No token given in websocket query param"
     }
+
+@router.get("/deliveries")
+async def get_all_deliveries(agent_id:int,delivery_repo:DeliveryRepo=Depends(get_delivery_repo)):
+   return await get_agents_deliveries(agent_id,delivery_repo)

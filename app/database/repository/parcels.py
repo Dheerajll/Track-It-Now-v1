@@ -105,7 +105,8 @@ class ParcelRepo:
         
         if parcels:
             parcels_out = [Parcel(**dict(parcel)) for parcel in parcels]
-        
+        else:
+            parcels_out = []
         return parcels_out
     
     async def get_one_parcel(self,parcel_id :int):
