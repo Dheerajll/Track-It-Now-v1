@@ -29,37 +29,37 @@ class ParcelServices:
         
         try:
         
-            #updated =  await self.parcelrepo.update_parcel_status(parcel_id,status)
+            updated =  await self.parcelrepo.update_parcel_status(parcel_id,status)
             '''
             To notify the sender and receiver about the updated status of the parcel
             '''
             updated_parcel = await self.parcelrepo.get_one_parcel(parcel_id)
             sender_id = str(updated_parcel.sender_id)
             receiver_id = str(updated_parcel.receiver_id)
-            #if updated:
-                #Notification about parcel status change.
-            message = {
-                "type" : "parcel-status-changed",
-                "message" : f"Parcel {parcel_id}'s state changed to {status}",
-                "parcel_id" :parcel_id,
-                "status" : status
-            }
+            if updated:
+                    #Notification about parcel status change.
+                message = {
+                    "type" : "parcel-status-changed",
+                    "message" : f"Parcel {parcel_id}'s state changed to {status}",
+                    "parcel_id" :parcel_id,
+                    "status" : status
+                }
 
-            #To receiver
-            await RNmanager.send_message(message=message,receiver_id=receiver_id)
+                #To receiver
+                await RNmanager.send_message(message=message,receiver_id=receiver_id)
 
-            #To sender 
-            await RNmanager.send_message(message=message,receiver_id=sender_id)
-            return {
-                "message" : "Status updated."
-            }
-            # else:
-            #      return {
-            #         "message" : "Status couldn't be updated."
-            #     }
-            
+                #To sender 
+                await RNmanager.send_message(message=message,receiver_id=sender_id)
+                return {
+                    "message" : "Status updated."
+                }
+            else:
+                return {
+                    "message" : "Status couldn't be updated."
+                }
+        
         except Exception as e:
-            raise HTTPException(status_code=500,detail=f"Error while updating parcel status. {e}")
+                raise HTTPException(status_code=500,detail=f"Error while updating parcel status. {e}")
         
     async def get_created_parcel(self,user_id:int):
         try:

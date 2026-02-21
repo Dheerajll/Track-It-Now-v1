@@ -54,12 +54,15 @@ class ParcelRepo:
         SET current_status = $1
         WHERE id = $2;
         """
-        async with self.pool.acquire() as conn:
-            result = await conn.execute(query,status,parcel_id)
-        if result == "UPDATE 0":
-            return False
-        else:
-            return True
+        try:
+            async with self.pool.acquire() as conn:
+                result = await conn.execute(query,status,parcel_id)
+            if result == "UPDATE 0":
+                return False
+            else:
+                return True
+        except Exception as e:
+            print("Error while delivery status update after deivered. ",e)
     #DELETE
     async def delete_parcel(self,parcel_id:int):
         query = """

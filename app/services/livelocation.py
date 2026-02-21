@@ -22,6 +22,7 @@ async def start_live_share(user_id:str,websocket:WebSocket,token:str,tracking_co
             '''
             Publish the message to the given tracking code channel
             '''
+            print("Livelocation published to pubsub.")
             await redis_client.publish(tracking_code,json.dumps(data))
 
     

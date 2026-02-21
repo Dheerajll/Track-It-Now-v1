@@ -30,3 +30,7 @@ def get_me(current_user:UserOut = Depends(get_current_active_user)):
 @router.get("/logout")
 async def logout(response:Response,userservices:UserServices = Depends(get_user_service),current_user:UserOut= Depends(get_current_active_user)):
     return  await userservices.logout_user(response,current_user)
+
+@router.get("/get-user")
+async def get_user(user_id:int,userservices:UserServices = Depends(get_user_service),current_user:UserOut= Depends(get_current_active_user)):
+    return await userservices.get_user_by_id(user_id=user_id)

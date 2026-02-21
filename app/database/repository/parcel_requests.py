@@ -22,9 +22,11 @@ class ParcelRequestRepo:
         RETURNING *;
         """
         expires_at = datetime.now(timezone.utc) + timedelta(days=1)
-        async with self.pool.acquire() as conn:
-            parcel_request = await conn.fetchrow(query,sender_id,receiver_id,expires_at,parcel_description,sender_location)
-        
+        try:
+            async with self.pool.acquire() as conn:
+                parcel_request = await conn.fetchrow(query,sender_id,receiver_id,expires_at,parcel_description,sender_location)
+        except Exception as e:
+            print(e)
         return ParcelRequest(**(dict(parcel_request)))
     
     async def update_parcel_request_status(self,request_id:int,status:str):
