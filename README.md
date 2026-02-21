@@ -25,7 +25,7 @@ The backend service for the Parcel Tracer platform. It handles real-time parcel 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Dheerajll/Track-It-Now-v1.git
 cd backend-v1
 ```
 
@@ -111,3 +111,4 @@ Swagger docs will be available at: **http://localhost:8000/docs**
 |--------|----------|-------------|
 | WS | `/go-online/{user_id}` | WebSocket for agent to go online |
 | WS | `/search-agents/{user_id}` | WebSocket to search for nearby agents |
+
