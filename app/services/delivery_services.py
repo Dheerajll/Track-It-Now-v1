@@ -47,7 +47,7 @@ class DeliveryServices:
             '''
             Updating the parcel status to "assigned"
             '''
-            #await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
+            await self.parcel_service.update_parcel_status_by_agent(parcel_id,"assigned")
 
             print("Parcel status updated.")
             '''

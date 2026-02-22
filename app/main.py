@@ -18,6 +18,12 @@ async def lifespan(app:FastAPI):
         print("Database connection formed.")
     except Exception as e:
         print("Error on connecting database. ",e)
+    
+    try:
+        await session.init_db()
+        print("Database initialized.")
+    except Exception as e:
+        print("Error while initializing the database.")
     yield
 
     try:

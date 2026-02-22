@@ -1,5 +1,6 @@
 import asyncpg
 from app.core.config import settings
+from pathlib import Path
 '''
 The connection pool to the database in use.
 '''
@@ -10,10 +11,10 @@ The database configurations to identify and connect to
 the used database in our case the Postgres database.
 '''
 DATABASE_CONFIG = {
-    "user":"postgres",
-    "host":"localhost",
+    "user":settings.database_user,
+    "host":settings.database_host,
     "database":settings.database_name,
-    "port":settings.database_port,
+    "port":5432,
     "password":settings.database_password
 }
 
@@ -24,7 +25,13 @@ as the instance of the created pool to connect to the database.
 async def connect():
     global pool
     pool = await asyncpg.create_pool(**DATABASE_CONFIG)
-
+'''
+To create all the tables in the database.
+'''
+async def init_db():
+    sql = (Path(__file__).parent / "db_creation.sql").read_text()
+    async with pool.acquire() as conn:
+        await conn.execute(sql)
 
 '''
 To close the created pool on app shutdown.
