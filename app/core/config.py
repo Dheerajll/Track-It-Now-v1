@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     database_password :str
     database_user :str
     database_host :str
+    redis_url :str
 
     #token secrets
     SECRET_KEY : str
