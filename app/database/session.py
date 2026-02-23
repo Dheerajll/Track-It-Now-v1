@@ -24,7 +24,7 @@ as the instance of the created pool to connect to the database.
 '''
 async def connect():
     global pool
-    pool = await asyncpg.create_pool(**DATABASE_CONFIG)
+    pool = await asyncpg.create_pool(**DATABASE_CONFIG,statement_cache_size=0)
 '''
 To create all the tables in the database.
 '''
