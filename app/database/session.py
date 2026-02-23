@@ -14,7 +14,7 @@ DATABASE_CONFIG = {
     "user":settings.database_user,
     "host":settings.database_host,
     "database":settings.database_name,
-    "port":5432,
+    "port":settings.database_port,
     "password":settings.database_password
 }
 
